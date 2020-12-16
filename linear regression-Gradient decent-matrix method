@@ -1,0 +1,98 @@
+'''
+@time:2020/12/15 16:43
+Author:Yiyang Song
+@File:Own_code.py
+@Software:PyCharm
+
+'''
+# -*- coding = utf-8 -*-
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+import seaborn as sns
+sns.set(context="notebook",style='whitegrid')
+import matplotlib.pyplot as plt
+path=r'D:\我的文档\桌面\Python_study\Machine Learning\Coursera-ML-AndrewNg-Notes\code\ex1-linear regression\ex1data2.txt'
+data=pd.read_csv(path,header=None, names=['Size','Num_bedroom','Price'])
+
+def nomalizetion(a):
+    a=(a-a.mean())/a.std()
+    return a
+predit_x=np.array([1,(1650-data.Size.mean())/data.Size.std(),(3-data.Num_bedroom.mean())/data.Num_bedroom.std()]).reshape(1,-1)
+data=nomalizetion(data)
+print(data.head())
+x=data.iloc[:,:-1].values
+y=data.iloc[:,-1:].values
+x=np.insert(x,0,1,1)
+theta=np.ones(x.shape[1]).reshape(x.shape[1],-1)#n+1*1
+cost=[]
+iters=1000
+learnrate=0.01
+def cost_function(x,y,theta):
+    J=0.5/len(x)*np.power((x@theta-y),2)
+    return np.sum(J)
+cost.append(cost_function(x,y,theta))
+print(cost)
+def Grand_d(x,y,alpha,theta,iters):
+    for i in range(iters):
+        theta=theta-(alpha/len(x)*((x@theta-y).T@x).T)
+        cost.append(cost_function(x,y,theta))
+        # if cost[-2]-cost[-1]<0.0001:
+        #     break
+    return theta
+g=Grand_d(x,y,learnrate,theta,iters)
+print(g)
+plt.plot(np.arange(iters+1),cost)
+plt.show()
+
+print(predit_x@g*125039.899586+340412.659574)
+print(cost)
+
+
+
+
+
+# path=r'D:\我的文档\桌面\Python_study\Machine Learning\Coursera-ML-AndrewNg-Notes\code\ex1-linear regression\ex1data1.txt'
+# data=pd.read_csv(path,header=None, names=['Population','Profit'])
+#
+# # data['Population']=(data['Population']-8.1598)/3.869884
+# # data['Profit']=(data['Profit']-5.839135)/5.510262
+# data.insert(0, 'Ones',1)
+# # print(data)
+# # sns.lmplot('Population','Profit',data,fit_reg=False)
+# # plt.show()
+# # plt.scatter(data['Population'],data['Profit'])
+# # plt.show()
+# # a=np.eye(5)#diagonal Matrix
+# # print(a)
+#
+# ##单变量梯度下降
+# J=[]
+# learnrate=0.001
+# iters=10000
+# def cost_function(x,y,theta):
+#     J=x@theta.T-y
+#     J=J*J
+#     return np.sum(J)/(2*len(x))
+# x=data.iloc[:,:-1].values
+# y=data.iloc[:,-1:].values
+# theta=np.array([0,0]).reshape(1,-1)
+# J.append(cost_function(x,y,theta))
+#
+# def Grand_d(x,y,theta,learnrate,iters):
+#     for i in range(iters):
+#         theta=theta-(learnrate/len(x)*(x.T@(x@theta.T-y))).T
+#         J.append(cost_function(x,y,theta))
+#         if J[-2]-J[-1]<0.000001:
+#             break
+#     return theta, J
+# g,cost=Grand_d(x,y,theta,learnrate,iters)
+# print(g)
+# plt.plot(np.arange(iters+1),cost)
+# plt.show()
+# fig, ax = plt.subplots(figsize=(6,4))
+#
+# ax.plot(data.Population,x@g.T,color='r', label='prediction')
+# ax.scatter(data.Population,data.Profit, label='training')
+# ax.legend(loc=2)
+# plt.show()
